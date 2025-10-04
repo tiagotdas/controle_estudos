@@ -9,15 +9,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        // Aplica o modo escuro imediatamente para evitar flash de tela clara
-        if (localStorage.getItem('studyLogDarkMode') === 'true') {
-            document.documentElement.classList.add('dark');
-        }
-    </script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+<body class="bg-gray-100 text-gray-800">
 
     <!-- Container para Notificações Toast -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2"></div>
@@ -25,12 +19,9 @@
     <div class="container mx-auto p-4 md:p-8 max-w-7xl">
         <header class="flex justify-between items-center mb-8">
             <div class="text-left">
-                <h1 class="text-4xl font-bold text-gray-900 dark:text-white">Registrador de Estudos</h1>
-                <p class="text-gray-600 dark:text-gray-400 mt-2">Sua ferramenta para acompanhar o progresso e agendar revisões.</p>
+                <h1 class="text-4xl font-bold text-gray-900">Registrador de Estudos</h1>
+                <p class="text-gray-600 mt-2">Sua ferramenta para acompanhar o progresso e agendar revisões.</p>
             </div>
-            <button id="dark-mode-toggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                <!-- Ícone será inserido via JS -->
-            </button>
         </header>
 
         <!-- Seção de Lembretes -->
@@ -38,11 +29,11 @@
 
         <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Coluna do Formulário e Cronômetro -->
-            <div class="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg fade-in self-start">
+            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg fade-in self-start">
                 <!-- Seção do Cronômetro -->
-                <div class="text-center mb-6 border-b dark:border-gray-700 pb-6">
+                <div class="text-center mb-6 border-b pb-6">
                      <h2 class="text-2xl font-semibold mb-4">Cronômetro de Estudo</h2>
-                     <div id="stopwatch-display" class="text-5xl font-mono tracking-widest bg-gray-900 dark:bg-black text-white rounded-lg py-4 mb-4">
+                     <div id="stopwatch-display" class="text-5xl font-mono tracking-widest bg-gray-900 text-white rounded-lg py-4 mb-4">
                         00:00:00
                      </div>
                      <div class="flex justify-center space-x-3">
@@ -56,42 +47,42 @@
                 <form id="study-form" class="space-y-4">
                     <div class="flex items-end gap-4">
                         <div class="flex-grow">
-                            <label for="subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Assunto</label>
-                            <input type="text" id="subject" name="subject" required class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <label for="subject" class="block text-sm font-medium text-gray-700">Assunto</label>
+                            <input type="text" id="subject" name="subject" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                         </div>
                          <input type="color" id="subject-color" value="#54a0ff" title="Escolha uma cor para o assunto">
                     </div>
                     <div class="grid grid-cols-3 gap-4">
                         <div class="col-span-2">
-                            <label for="date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data</label>
-                            <input type="date" id="date" name="date" required class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
+                            <label for="date" class="block text-sm font-medium text-gray-700">Data</label>
+                            <input type="date" id="date" name="date" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                         </div>
                         <div>
-                            <label for="lesson-number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nº Aula</label>
-                            <input type="number" id="lesson-number" name="lesson-number" min="1" class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
+                            <label for="lesson-number" class="block text-sm font-medium text-gray-700">Nº Aula</label>
+                            <input type="number" id="lesson-number" name="lesson-number" min="1" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label for="start-time" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Início</label>
-                            <input type="time" id="start-time" name="start-time" required class="mt-1 block w-full px-3 py-2 bg-gray-200 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm" readonly>
+                            <label for="start-time" class="block text-sm font-medium text-gray-700">Início</label>
+                            <input type="time" id="start-time" name="start-time" required class="mt-1 block w-full px-3 py-2 bg-gray-200 border border-gray-300 rounded-md shadow-sm" readonly>
                         </div>
                         <div>
-                            <label for="end-time" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fim</label>
-                            <input type="time" id="end-time" name="end-time" required class="mt-1 block w-full px-3 py-2 bg-gray-200 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm" readonly>
+                            <label for="end-time" class="block text-sm font-medium text-gray-700">Fim</label>
+                            <input type="time" id="end-time" name="end-time" required class="mt-1 block w-full px-3 py-2 bg-gray-200 border border-gray-300 rounded-md shadow-sm" readonly>
                         </div>
                     </div>
                     <div>
-                        <label for="comments" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Comentários</label>
-                        <textarea id="comments" name="comments" rows="3" class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm"></textarea>
+                        <label for="comments" class="block text-sm font-medium text-gray-700">Comentários</label>
+                        <textarea id="comments" name="comments" rows="3" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm"></textarea>
                     </div>
                     <div>
-                        <label for="reminder-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Lembrete de Revisão</label>
+                        <label for="reminder-date" class="block text-sm font-medium text-gray-700">Lembrete de Revisão</label>
                         <div class="flex items-center gap-2 mt-1">
-                            <input type="date" id="reminder-date" name="reminder-date" class="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
-                            <button type="button" class="reminder-shortcut-btn px-2 py-1 text-xs border dark:border-gray-600 rounded-md" data-days="1">+1d</button>
-                            <button type="button" class="reminder-shortcut-btn px-2 py-1 text-xs border dark:border-gray-600 rounded-md" data-days="7">+7d</button>
-                            <button type="button" class="reminder-shortcut-btn px-2 py-1 text-xs border dark:border-gray-600 rounded-md" data-days="30">+30d</button>
+                            <input type="date" id="reminder-date" name="reminder-date" class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
+                            <button type="button" class="reminder-shortcut-btn px-2 py-1 text-xs border rounded-md" data-days="1">+1d</button>
+                            <button type="button" class="reminder-shortcut-btn px-2 py-1 text-xs border rounded-md" data-days="7">+7d</button>
+                            <button type="button" class="reminder-shortcut-btn px-2 py-1 text-xs border rounded-md" data-days="30">+30d</button>
                         </div>
                     </div>
                     <div class="flex gap-2">
@@ -106,12 +97,12 @@
             <!-- Coluna da Tabela e Gráfico -->
             <div class="lg:col-span-2 space-y-8">
                 <!-- Gráfico -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg fade-in">
-                    <div class="flex justify-between items-center mb-4 border-b dark:border-gray-700 pb-3">
+                <div class="bg-white p-6 rounded-xl shadow-lg fade-in">
+                    <div class="flex justify-between items-center mb-4 border-b pb-3">
                          <h2 class="text-2xl font-semibold">Tempo por Assunto</h2>
-                         <div class="flex rounded-lg p-1 bg-gray-200 dark:bg-gray-700">
+                         <div class="flex rounded-lg p-1 bg-gray-200">
                             <button id="pie-chart-btn" class="px-3 py-1 text-sm font-semibold rounded-md bg-indigo-600 text-white">Pizza</button>
-                            <button id="bar-chart-btn" class="px-3 py-1 text-sm font-semibold rounded-md text-gray-700 dark:text-gray-300">Barras</button>
+                            <button id="bar-chart-btn" class="px-3 py-1 text-sm font-semibold rounded-md text-gray-700">Barras</button>
                          </div>
                     </div>
                     <div class="mx-auto">
@@ -119,8 +110,8 @@
                     </div>
                 </div>
                 <!-- Tabela de Registros -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg fade-in">
-                    <div class="border-b dark:border-gray-700 pb-4 mb-4">
+                <div class="bg-white p-6 rounded-xl shadow-lg fade-in">
+                    <div class="border-b pb-4 mb-4">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-2xl font-semibold">Histórico de Estudos</h2>
                             <div class="flex space-x-2">
@@ -129,26 +120,26 @@
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input type="search" id="search-input" placeholder="🔎 Pesquisar por assunto..." class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
+                            <input type="search" id="search-input" placeholder="🔎 Pesquisar por assunto..." class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                             <div class="flex items-center gap-2">
-                                <input type="date" id="filter-start-date" class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
-                                <span class="text-gray-500 dark:text-gray-400">até</span>
-                                <input type="date" id="filter-end-date" class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
+                                <input type="date" id="filter-start-date" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
+                                <span class="text-gray-500">até</span>
+                                <input type="date" id="filter-end-date" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                                 <button id="clear-filter-btn" class="p-2 text-sm text-gray-500 hover:text-red-500" title="Limpar filtro">✖</button>
                             </div>
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Assunto</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Data</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Duração</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ações</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assunto</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duração</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
                                 </tr>
                             </thead>
-                            <tbody id="logs-table-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+                            <tbody id="logs-table-body" class="bg-white divide-y divide-gray-200"></tbody>
                         </table>
                         <p id="no-data-message" class="text-center text-gray-500 py-8">Nenhum registro encontrado.</p>
                     </div>

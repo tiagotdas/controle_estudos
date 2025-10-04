@@ -79,7 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const noDataMessage = document.getElementById('no-data-message');
     const dateInput = document.getElementById('date');
 
-    const darkModeToggle = document.getElementById('dark-mode-toggle');
     const toastContainer = document.getElementById('toast-container');
     const searchInput = document.getElementById('search-input');
     const filterStartDate = document.getElementById('filter-start-date');
@@ -165,19 +164,19 @@ document.addEventListener('DOMContentLoaded', () => {
             sortedLogs.forEach(log => {
                 const color = subjectColors[log.subject] || '#cccccc';
                 const row = document.createElement('tr');
-                row.className = 'fade-in dark:hover:bg-gray-700';
+                row.className = 'fade-in hover:bg-gray-100';
                 row.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
                             <div class="w-3 h-3 rounded-full mr-3" style="background-color: ${color};"></div>
                             <div>
-                                <div class="text-sm font-medium text-gray-900 dark:text-white">${log.subject} ${log.lessonNumber ? `(Aula ${log.lessonNumber})` : ''}</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">${log.comments || 'Sem comentários'}</div>
+                                <div class="text-sm font-medium text-gray-900">${log.subject} ${log.lessonNumber ? `(Aula ${log.lessonNumber})` : ''}</div>
+                                <div class="text-xs text-gray-500">${log.comments || 'Sem comentários'}</div>
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${formatDate(log.date)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${log.duration}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(log.date)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${log.duration}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button data-id="${log.id}" class="edit-btn text-indigo-600 hover:text-indigo-900 mr-3">Editar</button>
                         <button data-id="${log.id}" class="delete-btn text-red-600 hover:text-red-900">Apagar</button>
@@ -226,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 plugins: {
                     legend: {
                         display: currentChartType === 'pie',
-                        labels: { color: document.documentElement.classList.contains('dark') ? '#fff' : '#333' }
+                        labels: { color: '#333' }
                     },
                     tooltip: {
                         callbacks: {
@@ -245,10 +244,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: { color: document.documentElement.classList.contains('dark') ? '#fff' : '#333' }
+                        ticks: { color: '#333' }
                     },
                     x: {
-                        ticks: { color: document.documentElement.classList.contains('dark') ? '#fff' : '#333' }
+                        ticks: { color: '#333' }
                     }
                 }
             }
@@ -268,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (pendingReminders.length > 0) {
             const reminderContainer = document.createElement('div');
-            reminderContainer.className = 'bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg shadow-md fade-in dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-400';
+            reminderContainer.className = 'bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg shadow-md fade-in';
 
             let reminderList = '<h3 class="font-bold text-lg mb-2">Lembretes de Revisão!</h3><ul class="list-disc list-inside">';
             pendingReminders.forEach(log => {
@@ -339,44 +338,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const openEditModal = (log) => {
         editModal.innerHTML = `
-            <div class="relative top-10 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white dark:bg-gray-800">
+            <div class="relative top-10 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
                 <h3 class="text-2xl font-semibold text-center mb-6">Editar Registro</h3>
                 <form id="edit-form" class="space-y-4">
                     <input type="hidden" id="edit-id" value="${log.id}">
                     <div class="flex items-end gap-4">
                         <div class="flex-grow">
-                            <label for="edit-subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Assunto</label>
-                            <input type="text" id="edit-subject" value="${log.subject}" required class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
+                            <label for="edit-subject" class="block text-sm font-medium text-gray-700">Assunto</label>
+                            <input type="text" id="edit-subject" value="${log.subject}" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                         </div>
                         <input type="color" id="edit-subject-color" value="${subjectColors[log.subject] || '#54a0ff'}">
                     </div>
                     <div class="grid grid-cols-3 gap-4">
                        <div class="col-span-2">
-                            <label for="edit-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data</label>
-                            <input type="date" id="edit-date" value="${log.date}" required class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
+                            <label for="edit-date" class="block text-sm font-medium text-gray-700">Data</label>
+                            <input type="date" id="edit-date" value="${log.date}" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                         </div>
                         <div>
-                            <label for="edit-lesson-number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nº Aula</label>
-                            <input type="number" id="edit-lesson-number" value="${log.lessonNumber || ''}" min="1" class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
+                            <label for="edit-lesson-number" class="block text-sm font-medium text-gray-700">Nº Aula</label>
+                            <input type="number" id="edit-lesson-number" value="${log.lessonNumber || ''}" min="1" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label for="edit-start-time" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Início</label>
-                            <input type="time" id="edit-start-time" value="${log.startTime}" required class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
+                            <label for="edit-start-time" class="block text-sm font-medium text-gray-700">Início</label>
+                            <input type="time" id="edit-start-time" value="${log.startTime}" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                         </div>
                         <div>
-                            <label for="edit-end-time" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fim</label>
-                            <input type="time" id="edit-end-time" value="${log.endTime}" required class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
+                            <label for="edit-end-time" class="block text-sm font-medium text-gray-700">Fim</label>
+                            <input type="time" id="edit-end-time" value="${log.endTime}" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                         </div>
                     </div>
                     <div>
-                        <label for="edit-comments" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Comentários</label>
-                        <textarea id="edit-comments" rows="3" class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">${log.comments || ''}</textarea>
+                        <label for="edit-comments" class="block text-sm font-medium text-gray-700">Comentários</label>
+                        <textarea id="edit-comments" rows="3" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">${log.comments || ''}</textarea>
                     </div>
                     <div>
-                        <label for="edit-reminder-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Lembrete de Revisão</label>
-                        <input type="date" id="edit-reminder-date" value="${log.reminderDate || ''}" class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm">
+                        <label for="edit-reminder-date" class="block text-sm font-medium text-gray-700">Lembrete de Revisão</label>
+                        <input type="date" id="edit-reminder-date" value="${log.reminderDate || ''}" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                     </div>
                     <div class="flex justify-end space-x-3 pt-4">
                         <button type="button" id="cancel-edit-btn" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-gray-300">Cancelar</button>
@@ -466,24 +465,9 @@ document.addEventListener('DOMContentLoaded', () => {
         currentChartType = 'bar';
         renderLogs();
         barChartBtn.classList.add('bg-indigo-600', 'text-white');
-        barChartBtn.classList.remove('text-gray-700', 'dark:text-gray-300');
+        barChartBtn.classList.remove('text-gray-700');
         pieChartBtn.classList.remove('bg-indigo-600', 'text-white');
-        pieChartBtn.classList.add('text-gray-700', 'dark:text-gray-300');
-    });
-
-    // Lógica do Modo Escuro
-    const sunIcon = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`;
-    const moonIcon = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>`;
-
-    const updateDarkModeIcon = () => {
-        darkModeToggle.innerHTML = document.documentElement.classList.contains('dark') ? sunIcon : moonIcon;
-    };
-
-    darkModeToggle.addEventListener('click', () => {
-        document.documentElement.classList.toggle('dark');
-        localStorage.setItem('studyLogDarkMode', document.documentElement.classList.contains('dark'));
-        updateDarkModeIcon();
-        renderLogs(); // Re-renderiza para atualizar as cores do gráfico
+        pieChartBtn.classList.add('text-gray-700');
     });
 
     // Eventos de Ações Gerais
@@ -531,6 +515,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- INICIALIZAÇÃO ---
     dateInput.valueAsDate = new Date();
-    updateDarkModeIcon();
     renderLogs();
 });
