@@ -67,7 +67,7 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center gap-3">
                     <i data-lucide="sigma" class="text-brand-600 dark:text-brand-500 w-8 h-8"></i>
-                    <span class="font-bold text-xl tracking-tight">StudyTracker <span class="text-brand-600 dark:text-brand-400">v3.2</span></span>
+                    <span class="font-bold text-xl tracking-tight">StudyTracker <span class="text-brand-600 dark:text-brand-400">v3.3</span></span>
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="hidden md:flex gap-2 mr-4 border-r pr-4 dark:border-gray-700">
@@ -187,7 +187,7 @@
                                         class="block w-full pl-3 pr-10 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all" list="subjects-datalist">
                                     <datalist id="subjects-datalist"></datalist>
                                 </div>
-                                <input type="color" id="subject-color" value="#0ea5e9" class="h-[46px] w-[46px] rounded-lg cursor-pointer bg-transparent border-0 p-0">
+                                <input type="color" id="subject-color" name="subject-color" value="#0ea5e9" class="h-[46px] w-[46px] rounded-lg cursor-pointer bg-transparent border-0 p-0">
                             </div>
                         </div>
 
@@ -199,7 +199,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tipo</label>
-                                <select id="study-type" class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-brand-500">
+                                <select id="study-type" name="study-type" class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-brand-500">
                                     <option value="Teoria">📖 Teoria</option>
                                     <option value="Exercícios">📝 Exercícios</option>
                                     <option value="Revisão">🔄 Revisão</option>
@@ -212,18 +212,18 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Início</label>
-                                <input type="time" id="start-time" required class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-brand-500">
+                                <input type="time" id="start-time" name="start-time" required class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-brand-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Fim</label>
-                                <input type="time" id="end-time" required class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-brand-500">
+                                <input type="time" id="end-time" name="end-time" required class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-brand-500">
                             </div>
                         </div>
 
                         <!-- Comentários -->
                         <div>
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Notas (Suporta LaTeX: $\int x dx$)</label>
-                            <textarea id="comments" rows="2" placeholder="Ex: Revisei $\lim_{x \to 0} \frac{\sin x}{x}$..." class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-brand-500 focus:border-brand-500 font-mono text-sm"></textarea>
+                            <textarea id="comments" name="comments" rows="2" placeholder="Ex: Revisei $\lim_{x \to 0} \frac{\sin x}{x}$..." class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-brand-500 focus:border-brand-500 font-mono text-sm"></textarea>
                         </div>
 
                         <!-- Lembrete -->
@@ -235,7 +235,7 @@
                                     <button type="button" class="reminder-shortcut text-xs bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded hover:bg-gray-300" data-days="7">+7d</button>
                                 </div>
                             </div>
-                            <input type="date" id="reminder-date" class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg">
+                            <input type="date" id="reminder-date" name="reminder-date" class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg">
                         </div>
 
                         <div class="pt-2 flex gap-3">
@@ -461,22 +461,30 @@
         // --- FORM SUBMIT & EDITING ---
         elements.form.onsubmit = (e) => {
             e.preventDefault();
-            const fd = new FormData(elements.form);
-            const subject = fd.get('subject').trim();
+            // Correção Crítica: Captura direta dos valores por ID
+            // Elimina dependência de 'name' e FormData que causava o bug
+            const subject = el('subject').value.trim();
+            const subjectColor = el('subject-color').value;
+            const dateVal = el('date').value;
+            const typeVal = el('study-type').value;
+            const startTimeVal = el('start-time').value;
+            const endTimeVal = el('end-time').value;
+            const commentsVal = el('comments').value;
+            const reminderVal = el('reminder-date').value;
             
-            state.colors[subject] = el('subject-color').value;
+            state.colors[subject] = subjectColor;
 
             const newLog = {
-                id: state.editingId ? state.editingId : Date.now(), // Preserve ID if editing
-                subject,
-                color: el('subject-color').value,
-                date: fd.get('date'),
-                type: el('study-type').value,
-                startTime: fd.get('start-time'),
-                endTime: fd.get('end-time'),
-                duration: calcDurationStr(fd.get('start-time'), fd.get('end-time')),
-                comments: el('comments').value,
-                reminder: el('reminder-date').value
+                id: state.editingId ? state.editingId : Date.now(),
+                subject: subject,
+                color: subjectColor,
+                date: dateVal,
+                type: typeVal,
+                startTime: startTimeVal,
+                endTime: endTimeVal,
+                duration: calcDurationStr(startTimeVal, endTimeVal),
+                comments: commentsVal,
+                reminder: reminderVal
             };
 
             if (state.editingId) {
@@ -587,10 +595,8 @@
         const calculateKPIs = (dataSource) => {
             const totalMin = dataSource.reduce((acc, l) => acc + calcMinutes(l.duration), 0);
             elements.kpi.total.textContent = `${Math.floor(totalMin/60)}h ${totalMin%60}m`;
-            // Removed sessions update because HTML element was removed, effectively replacing it with Streak
-
+            
             // Avg Daily (Last 30 days of data present in filter)
-            // Just average of the total / 30 is simpler for a snapshot
             const avgMins = totalMin / 30;
             elements.kpi.avgDaily.textContent = `${Math.floor(avgMins/60)}h ${Math.floor(avgMins%60)}m`;
 
