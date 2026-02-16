@@ -3,13 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyTracker Pro - Análise e Controle</title>
+    <title>StudyTracker Pro - Math Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- MathJax para renderização de fórmulas matemáticas (Cálculo) -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Ícones Lucide para interface mais limpa -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         tailwind.config = {
@@ -23,7 +31,6 @@
                 }
             }
         }
-        // Aplica o tema escuro imediatamente se salvo ou se for preferência do sistema
         if (localStorage.getItem('studyLogDarkMode') === 'true' || (!('studyLogDarkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
@@ -32,14 +39,12 @@
     </script>
     <style>
         body { transition: background-color 0.3s, color 0.3s; }
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* Heatmap Grid */
         .heatmap-grid {
             display: grid;
             grid-template-rows: repeat(7, 12px);
@@ -48,32 +53,23 @@
             overflow-x: auto;
             padding-bottom: 5px;
         }
-        .heatmap-cell {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-        }
-        
-        /* Animations */
+        .heatmap-cell { width: 12px; height: 12px; border-radius: 2px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { animation: fadeIn 0.4s ease-out forwards; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200 min-h-screen flex flex-col">
 
-    <!-- Toast Container -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
 
-    <!-- Top Navigation -->
     <nav class="bg-white dark:bg-gray-800 border-b dark:border-gray-700 sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center gap-3">
-                    <i data-lucide="graduation-cap" class="text-brand-600 dark:text-brand-500 w-8 h-8"></i>
-                    <span class="font-bold text-xl tracking-tight">StudyTracker <span class="text-brand-600 dark:text-brand-400">Pro</span></span>
+                    <i data-lucide="sigma" class="text-brand-600 dark:text-brand-500 w-8 h-8"></i>
+                    <span class="font-bold text-xl tracking-tight">StudyTracker <span class="text-brand-600 dark:text-brand-400">v3.1</span></span>
                 </div>
                 <div class="flex items-center gap-3">
-                    <!-- Backup Actions -->
                     <div class="hidden md:flex gap-2 mr-4 border-r pr-4 dark:border-gray-700">
                         <input type="file" id="import-json" class="hidden" accept=".json">
                         <button onclick="document.getElementById('import-json').click()" class="p-2 text-gray-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors" title="Importar Backup (JSON)">
@@ -83,9 +79,7 @@
                             <i data-lucide="download-cloud" class="w-5 h-5"></i>
                         </button>
                     </div>
-                    <!-- Dark Mode Toggle Button -->
                     <button id="dark-mode-toggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500">
-                        <!-- Icons use Tailwind utility classes to toggle visibility automatically -->
                         <i data-lucide="moon" class="w-5 h-5 dark:hidden text-gray-600"></i>
                         <i data-lucide="sun" class="w-5 h-5 hidden dark:block text-yellow-400"></i>
                     </button>
@@ -98,39 +92,46 @@
         
         <!-- KPI Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 fade-in">
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border dark:border-gray-700 flex items-center gap-4">
+            <!-- Card 1: Total -->
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border dark:border-gray-700 flex items-center gap-4 transition-all hover:shadow-md">
                 <div class="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
                     <i data-lucide="clock" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Total Estudado</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Total (Filtrado)</p>
                     <h3 class="text-xl font-bold" id="kpi-total-time">0h 00m</h3>
                 </div>
             </div>
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border dark:border-gray-700 flex items-center gap-4">
+
+            <!-- Card 2: Streak (Restaurado) -->
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border dark:border-gray-700 flex items-center gap-4 transition-all hover:shadow-md">
                 <div class="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg text-green-600 dark:text-green-400">
-                    <i data-lucide="calendar-check" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Sessões</p>
-                    <h3 class="text-xl font-bold" id="kpi-total-sessions">0</h3>
-                </div>
-            </div>
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border dark:border-gray-700 flex items-center gap-4">
-                <div class="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg text-purple-600 dark:text-purple-400">
                     <i data-lucide="flame" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Sequência (Streak)</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Sequência</p>
                     <h3 class="text-xl font-bold" id="kpi-streak">0 dias</h3>
                 </div>
             </div>
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border dark:border-gray-700 flex items-center gap-4">
+
+            <!-- Card 3: Média Diária -->
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border dark:border-gray-700 flex items-center gap-4 transition-all hover:shadow-md">
+                <div class="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg text-purple-600 dark:text-purple-400">
+                    <i data-lucide="trending-up" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Média Diária (30d)</p>
+                    <h3 class="text-xl font-bold" id="kpi-avg-daily">0h 00m</h3>
+                </div>
+            </div>
+
+            <!-- Card 4: Foco Principal -->
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border dark:border-gray-700 flex items-center gap-4 transition-all hover:shadow-md">
                 <div class="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-lg text-orange-600 dark:text-orange-400">
                     <i data-lucide="book-open" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Assunto Top</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Principal Foco</p>
                     <h3 class="text-xl font-bold truncate max-w-[120px]" id="kpi-top-subject">-</h3>
                 </div>
             </div>
@@ -170,11 +171,13 @@
                 </div>
 
                 <!-- Form Card -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border dark:border-gray-700 fade-in" style="animation-delay: 0.1s;">
-                    <h2 class="font-semibold text-lg mb-4 flex items-center gap-2">
-                        <i data-lucide="pen-tool" class="w-5 h-5"></i> Detalhes da Sessão
+                <div id="form-card" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border dark:border-gray-700 fade-in transition-all duration-300 ring-0 ring-brand-500" style="animation-delay: 0.1s;">
+                    <h2 class="font-semibold text-lg mb-4 flex items-center justify-between">
+                        <span class="flex items-center gap-2"><i data-lucide="pen-tool" class="w-5 h-5"></i> <span id="form-title">Detalhes da Sessão</span></span>
+                        <button id="cancel-edit-btn" class="hidden text-xs text-red-500 hover:underline">Cancelar Edição</button>
                     </h2>
                     <form id="study-form" class="space-y-4">
+                        <input type="hidden" id="edit-id" name="edit-id" value="">
                         <!-- Assunto e Cor -->
                         <div>
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">O que você estudou?</label>
@@ -205,22 +208,22 @@
                             </div>
                         </div>
 
-                        <!-- Timestamps (Hidden logic mostly, but visible for edit) -->
+                        <!-- Timestamps -->
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Início</label>
-                                <input type="time" id="start-time" required readonly class="block w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-transparent rounded-lg text-gray-500 cursor-not-allowed">
+                                <input type="time" id="start-time" required class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-brand-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Fim</label>
-                                <input type="time" id="end-time" required readonly class="block w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-transparent rounded-lg text-gray-500 cursor-not-allowed">
+                                <input type="time" id="end-time" required class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-brand-500">
                             </div>
                         </div>
 
                         <!-- Comentários -->
                         <div>
-                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Notas / Aula nº</label>
-                            <textarea id="comments" rows="2" placeholder="Aula 05 - Integrais Múltiplas..." class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-brand-500 focus:border-brand-500"></textarea>
+                            <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Notas (Suporta LaTeX: $\int x dx$)</label>
+                            <textarea id="comments" rows="2" placeholder="Ex: Revisei $\lim_{x \to 0} \frac{\sin x}{x}$..." class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-brand-500 focus:border-brand-500 font-mono text-sm"></textarea>
                         </div>
 
                         <!-- Lembrete -->
@@ -237,7 +240,7 @@
 
                         <div class="pt-2 flex gap-3">
                             <button type="button" id="clear-form" class="flex-1 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Limpar</button>
-                            <button type="submit" class="flex-[2] py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg shadow-md transition-colors flex justify-center items-center gap-2">
+                            <button type="submit" id="submit-btn" class="flex-[2] py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg shadow-md transition-colors flex justify-center items-center gap-2">
                                 <i data-lucide="save" class="w-4 h-4"></i> Salvar
                             </button>
                         </div>
@@ -252,10 +255,9 @@
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border dark:border-gray-700 fade-in overflow-hidden">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="font-semibold text-lg flex items-center gap-2">
-                            <i data-lucide="activity" class="w-5 h-5"></i> Consistência (Últimos 365 dias)
+                            <i data-lucide="activity" class="w-5 h-5"></i> Consistência (365 dias)
                         </h2>
                     </div>
-                    <!-- Heatmap Container -->
                     <div class="w-full overflow-x-auto">
                          <div id="heatmap-container" class="heatmap-grid min-w-max"></div>
                     </div>
@@ -273,9 +275,10 @@
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border dark:border-gray-700 fade-in" style="animation-delay: 0.1s;">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="font-semibold text-lg">Análise de Tempo</h2>
-                        <div class="bg-gray-100 dark:bg-gray-700 p-1 rounded-lg flex text-sm">
-                            <button class="chart-toggle px-3 py-1 rounded-md bg-white dark:bg-gray-600 shadow-sm transition-all" data-type="doughnut">Pizza</button>
-                            <button class="chart-toggle px-3 py-1 rounded-md text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-all" data-type="bar">Barras</button>
+                        <div class="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-lg text-sm">
+                            <button class="chart-toggle px-3 py-1 rounded-md transition-all text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white" data-type="doughnut">Pizza</button>
+                            <button class="chart-toggle px-3 py-1 rounded-md transition-all text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white" data-type="bar">Barras</button>
+                            <button class="chart-toggle px-3 py-1 rounded-md transition-all text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white" data-type="line">Tendência</button>
                         </div>
                     </div>
                     <div class="h-64 w-full">
@@ -292,7 +295,7 @@
                         <div class="flex gap-2 w-full sm:w-auto">
                             <div class="relative flex-grow sm:flex-grow-0">
                                 <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
-                                <input type="text" id="search-input" placeholder="Buscar..." class="pl-9 pr-3 py-2 w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg text-sm">
+                                <input type="text" id="search-input" placeholder="Buscar (Ex: $\int$)..." class="pl-9 pr-3 py-2 w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg text-sm">
                             </div>
                             <button id="export-csv-btn" class="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg shadow-sm" title="Exportar CSV (Excel)">
                                 <i data-lucide="sheet" class="w-5 h-5"></i>
@@ -327,20 +330,6 @@
         </main>
     </div>
 
-    <!-- Edit Modal (Simplified) -->
-    <dialog id="edit-modal" class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-0 w-full max-w-lg backdrop:bg-gray-900/50">
-        <div class="p-6 border-b dark:border-gray-700 flex justify-between items-center">
-            <h3 class="text-lg font-bold">Editar Registro</h3>
-            <button onclick="document.getElementById('edit-modal').close()" class="text-gray-500 hover:text-gray-700 dark:hover:text-white">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-        </div>
-        <div class="p-6">
-            <!-- Reuse form logic via JS dynamically or clone fields here. For simplicity, we build form inside JS -->
-            <div id="modal-content"></div>
-        </div>
-    </dialog>
-
     <script>
         // --- CORE LOGIC & STATE ---
         const state = {
@@ -348,10 +337,10 @@
             colors: JSON.parse(localStorage.getItem('subjectColors')) || {},
             timer: { interval: null, startTime: 0, elapsed: 0, isPaused: false, sessionStart: null },
             chart: null,
-            chartType: 'doughnut'
+            chartType: 'doughnut',
+            editingId: null // Para controlar edição
         };
 
-        // --- DOM ELEMENTS ---
         const el = id => document.getElementById(id);
         const elements = {
             display: el('stopwatch-display'),
@@ -365,29 +354,24 @@
             subjectList: el('subjects-datalist'),
             kpi: {
                 total: el('kpi-total-time'),
-                sessions: el('kpi-total-sessions'),
                 streak: el('kpi-streak'),
+                avgDaily: el('kpi-avg-daily'),
                 top: el('kpi-top-subject')
             }
         };
 
-        // --- ICONS & UI INIT ---
         lucide.createIcons();
         
-        // --- HELPERS FOR LOCAL TIMEZONE PRECISION ---
+        // --- HELPERS ---
         const getLocalDateStr = (dateObj) => {
-            // Returns YYYY-MM-DD respecting the local browser timezone (not UTC)
             const year = dateObj.getFullYear();
             const month = String(dateObj.getMonth() + 1).padStart(2, '0');
             const day = String(dateObj.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         };
 
-        // --- STOPWATCH ENGINE ---
-        const formatTime = (ms) => {
-            const date = new Date(ms);
-            return date.toISOString().substr(11, 8);
-        };
+        // --- STOPWATCH ---
+        const formatTime = (ms) => new Date(ms).toISOString().substr(11, 8);
 
         const updateDisplay = () => {
             const now = Date.now();
@@ -399,7 +383,6 @@
             if (!state.timer.sessionStart) state.timer.sessionStart = new Date();
             state.timer.startTime = Date.now();
             state.timer.interval = setInterval(updateDisplay, 100);
-            
             elements.btnStart.disabled = true;
             elements.btnPause.disabled = false;
             elements.btnStop.disabled = false;
@@ -412,31 +395,27 @@
                 clearInterval(state.timer.interval);
                 state.timer.elapsed += Date.now() - state.timer.startTime;
                 elements.btnPause.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i> Retomar`;
-                lucide.createIcons();
                 el('session-status').textContent = "Pausado";
                 el('session-status').className = "text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400";
             } else {
                 state.timer.startTime = Date.now();
                 state.timer.interval = setInterval(updateDisplay, 100);
                 elements.btnPause.innerHTML = `<i data-lucide="pause" class="w-4 h-4"></i> Pausa`;
-                lucide.createIcons();
                 el('session-status').textContent = "Em andamento...";
                 el('session-status').className = "text-xs px-2 py-1 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400";
             }
             state.timer.isPaused = !state.timer.isPaused;
+            lucide.createIcons();
         };
 
         elements.btnStop.onclick = () => {
             clearInterval(state.timer.interval);
             const now = new Date();
-            
-            // Auto-fill form
             const pad = n => String(n).padStart(2,'0');
             el('start-time').value = `${pad(state.timer.sessionStart.getHours())}:${pad(state.timer.sessionStart.getMinutes())}`;
             el('end-time').value = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
-            el('date').value = getLocalDateStr(new Date()); // Ensure local date for form
+            el('date').value = getLocalDateStr(new Date());
 
-            // Reset Timer
             elements.display.textContent = "00:00:00";
             state.timer = { interval: null, startTime: 0, elapsed: 0, isPaused: false, sessionStart: null };
             
@@ -448,7 +427,6 @@
             el('session-status').className = "text-xs px-2 py-1 rounded bg-blue-100 text-blue-700 animate-pulse";
             lucide.createIcons();
             
-            // Scroll to form
             elements.form.scrollIntoView({ behavior: 'smooth' });
             el('subject').focus();
         };
@@ -463,7 +441,7 @@
         const calcDurationStr = (start, end) => {
             const d1 = new Date(`1970-01-01T${start}`);
             const d2 = new Date(`1970-01-01T${end}`);
-            let diff = (d2 - d1) / 60000; // minutes
+            let diff = (d2 - d1) / 60000; 
             if (diff < 0) diff += 24 * 60;
             const h = Math.floor(diff / 60);
             const m = Math.floor(diff % 60);
@@ -475,16 +453,16 @@
             return match ? parseInt(match[1])*60 + parseInt(match[2]) : 0;
         };
 
+        // --- FORM SUBMIT & EDITING ---
         elements.form.onsubmit = (e) => {
             e.preventDefault();
             const fd = new FormData(elements.form);
             const subject = fd.get('subject').trim();
             
-            // Save Color preference
             state.colors[subject] = el('subject-color').value;
 
             const newLog = {
-                id: Date.now(),
+                id: state.editingId ? state.editingId : Date.now(), // Preserve ID if editing
                 subject,
                 color: el('subject-color').value,
                 date: fd.get('date'),
@@ -496,146 +474,227 @@
                 reminder: el('reminder-date').value
             };
 
-            state.logs.push(newLog);
+            if (state.editingId) {
+                // Update existing
+                const index = state.logs.findIndex(l => l.id === state.editingId);
+                if (index !== -1) state.logs[index] = newLog;
+                showToast("Registro atualizado com sucesso!", "success");
+                endEditMode();
+            } else {
+                // Create new
+                state.logs.push(newLog);
+                showToast("Sessão registrada com sucesso!", "success");
+                elements.form.reset();
+                el('date').value = getLocalDateStr(new Date());
+                el('subject-color').value = '#0ea5e9';
+            }
+
             saveData();
-            elements.form.reset();
-            el('date').value = getLocalDateStr(new Date()); // Reset to local date
-            el('subject-color').value = '#0ea5e9'; // reset color
             el('session-status').textContent = "Parado";
             el('session-status').className = "text-xs px-2 py-1 rounded bg-gray-100 text-gray-500";
-            showToast("Sessão registrada com sucesso!", "success");
         };
 
-        // --- HEATMAP LOGIC ---
-        const renderHeatmap = () => {
+        // Edit Mode Logic
+        window.editLog = (id) => {
+            const log = state.logs.find(l => l.id === id);
+            if (!log) return;
+
+            state.editingId = id;
+            
+            // Populate Form
+            el('subject').value = log.subject;
+            el('subject-color').value = log.color || state.colors[log.subject] || '#0ea5e9';
+            el('date').value = log.date;
+            el('study-type').value = log.type || 'Teoria';
+            el('start-time').value = log.startTime || '';
+            el('end-time').value = log.endTime || '';
+            el('comments').value = log.comments || '';
+            el('reminder-date').value = log.reminder || '';
+
+            // UI Changes
+            el('form-title').textContent = "Editando Registro";
+            el('submit-btn').innerHTML = `<i data-lucide="refresh-cw" class="w-4 h-4"></i> Atualizar`;
+            el('submit-btn').classList.replace('bg-brand-600', 'bg-orange-600');
+            el('submit-btn').classList.replace('hover:bg-brand-700', 'hover:bg-orange-700');
+            el('form-card').classList.add('ring-2');
+            el('cancel-edit-btn').classList.remove('hidden');
+
+            elements.form.scrollIntoView({ behavior: 'smooth' });
+            lucide.createIcons();
+        };
+
+        const endEditMode = () => {
+            state.editingId = null;
+            elements.form.reset();
+            el('date').value = getLocalDateStr(new Date());
+            
+            el('form-title').textContent = "Detalhes da Sessão";
+            el('submit-btn').innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> Salvar`;
+            el('submit-btn').classList.replace('bg-orange-600', 'bg-brand-600');
+            el('submit-btn').classList.replace('hover:bg-orange-700', 'hover:bg-brand-700');
+            el('form-card').classList.remove('ring-2');
+            el('cancel-edit-btn').classList.add('hidden');
+            lucide.createIcons();
+        };
+
+        el('cancel-edit-btn').onclick = (e) => {
+            e.preventDefault();
+            endEditMode();
+        };
+
+        el('clear-form').onclick = () => {
+             if(state.editingId) endEditMode();
+             else elements.form.reset();
+        };
+
+        // --- CHARTS & KPIS ---
+        const renderHeatmap = (dataSource) => {
             elements.heatmap.innerHTML = '';
             const today = new Date();
-            // Start 365 days ago
             const startDate = new Date(today);
             startDate.setDate(today.getDate() - 364);
             
-            // Group logs by date
             const logsByDate = {};
-            state.logs.forEach(l => {
-                const mins = calcMinutes(l.duration);
-                logsByDate[l.date] = (logsByDate[l.date] || 0) + mins;
+            dataSource.forEach(l => {
+                logsByDate[l.date] = (logsByDate[l.date] || 0) + calcMinutes(l.duration);
             });
 
-            // Generate Grid
             for (let i = 0; i < 365; i++) {
                 const d = new Date(startDate);
                 d.setDate(startDate.getDate() + i);
-                
-                // FIXED: Use Local Time String generator to match 'date' input values
                 const dateStr = getLocalDateStr(d);
-                
                 const minutes = logsByDate[dateStr] || 0;
                 
                 const cell = document.createElement('div');
                 cell.className = 'heatmap-cell transition-all hover:scale-125';
-                
                 const dayName = d.toLocaleDateString('pt-BR', { weekday: 'short' });
                 const dateDisplay = d.toLocaleDateString('pt-BR');
                 cell.title = `${dayName}, ${dateDisplay}: ${Math.floor(minutes/60)}h ${minutes%60}m`;
                 
-                // Color Logic
                 if (minutes === 0) cell.classList.add('bg-gray-200', 'dark:bg-gray-700');
                 else if (minutes < 30) cell.classList.add('bg-brand-100', 'dark:bg-brand-900');
                 else if (minutes < 90) cell.classList.add('bg-brand-500');
                 else cell.classList.add('bg-brand-700');
-
                 elements.heatmap.appendChild(cell);
             }
         };
 
-        // --- KPI & CHART LOGIC ---
-        const calculateKPIs = () => {
-            // Total Time & Sessions
-            const totalMin = state.logs.reduce((acc, l) => acc + calcMinutes(l.duration), 0);
+        const calculateKPIs = (dataSource) => {
+            const totalMin = dataSource.reduce((acc, l) => acc + calcMinutes(l.duration), 0);
             elements.kpi.total.textContent = `${Math.floor(totalMin/60)}h ${totalMin%60}m`;
-            elements.kpi.sessions.textContent = state.logs.length;
+            // Removed sessions update because HTML element was removed, effectively replacing it with Streak
 
-            // Top Subject
+            // Avg Daily (Last 30 days of data present in filter)
+            // Just average of the total / 30 is simpler for a snapshot
+            const avgMins = totalMin / 30;
+            elements.kpi.avgDaily.textContent = `${Math.floor(avgMins/60)}h ${Math.floor(avgMins%60)}m`;
+
             const subjects = {};
-            state.logs.forEach(l => subjects[l.subject] = (subjects[l.subject] || 0) + calcMinutes(l.duration));
+            dataSource.forEach(l => subjects[l.subject] = (subjects[l.subject] || 0) + calcMinutes(l.duration));
             const sortedSubj = Object.entries(subjects).sort((a,b) => b[1] - a[1]);
             elements.kpi.top.textContent = sortedSubj.length ? sortedSubj[0][0] : '-';
 
-            // Current Streak
-            // Logic: Sort dates unique desc, check consecutive days
-            const uniqueDates = [...new Set(state.logs.map(l => l.date))].sort().reverse();
+            // Streak (unchanged logic)
+            const uniqueDates = [...new Set(dataSource.map(l => l.date))].sort().reverse();
             let streak = 0;
             if (uniqueDates.length > 0) {
                 const today = getLocalDateStr(new Date());
                 const yesterdayObj = new Date();
                 yesterdayObj.setDate(yesterdayObj.getDate() - 1);
                 const yesterday = getLocalDateStr(yesterdayObj);
-                
-                // If studied today or yesterday, streak is active
                 let currentCheck = uniqueDates[0] === today ? today : (uniqueDates[0] === yesterday ? yesterday : null);
-                
                 if (currentCheck) {
                     streak = 1;
                     for (let i = 1; i < uniqueDates.length; i++) {
-                        const prev = new Date(currentCheck);
-                        prev.setDate(prev.getDate() - 1);
-                        // Fix previous date string calculation too
-                        // Note: Date strings in uniqueDates are YYYY-MM-DD from input[type=date]
-                        // We must parse them correctly to subtract days without timezone shift
                         const parts = currentCheck.split('-');
-                        const dObj = new Date(parts[0], parts[1]-1, parts[2]); // Local constructor
+                        const dObj = new Date(parts[0], parts[1]-1, parts[2]);
                         dObj.setDate(dObj.getDate() - 1);
                         const expectedStr = getLocalDateStr(dObj);
-
-                        if (uniqueDates[i] === expectedStr) {
-                            streak++;
-                            currentCheck = expectedStr;
-                        } else break;
+                        if (uniqueDates[i] === expectedStr) { streak++; currentCheck = expectedStr; } 
+                        else break;
                     }
                 }
             }
-            elements.kpi.streak.textContent = `${streak} dias`;
+            if(elements.kpi.streak) elements.kpi.streak.textContent = `${streak} dias`;
         };
 
-        const renderChart = () => {
+        const renderChart = (dataSource) => {
             if (state.chart) state.chart.destroy();
             const ctx = el('study-chart').getContext('2d');
             
-            const subjData = {};
-            state.logs.forEach(l => subjData[l.subject] = (subjData[l.subject] || 0) + calcMinutes(l.duration));
-            
-            const labels = Object.keys(subjData);
-            const data = Object.values(subjData);
-            const bgColors = labels.map(l => state.colors[l] || '#cbd5e1');
+            // Data Prep
+            const chartData = { labels: [], datasets: [] };
+            const isDark = document.documentElement.classList.contains('dark');
+
+            if (state.chartType === 'line') {
+                // Time Series (Last 14 Days)
+                const days = [];
+                const dataPoints = [];
+                for(let i=13; i>=0; i--) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i);
+                    const dStr = getLocalDateStr(d);
+                    days.push(d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}));
+                    
+                    const dailySum = dataSource
+                        .filter(l => l.date === dStr)
+                        .reduce((acc, l) => acc + calcMinutes(l.duration), 0);
+                    dataPoints.push(dailySum);
+                }
+                
+                chartData.labels = days;
+                chartData.datasets = [{
+                    label: 'Minutos Diários',
+                    data: dataPoints,
+                    borderColor: '#0ea5e9',
+                    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }];
+            } else {
+                // Distribution (Doughnut/Bar)
+                const subjData = {};
+                dataSource.forEach(l => subjData[l.subject] = (subjData[l.subject] || 0) + calcMinutes(l.duration));
+                chartData.labels = Object.keys(subjData);
+                chartData.datasets = [{
+                    label: 'Minutos',
+                    data: Object.values(subjData),
+                    backgroundColor: chartData.labels.map(l => state.colors[l] || '#cbd5e1'),
+                    borderWidth: 0
+                }];
+            }
 
             state.chart = new Chart(ctx, {
                 type: state.chartType,
-                data: {
-                    labels,
-                    datasets: [{
-                        label: 'Minutos',
-                        data,
-                        backgroundColor: bgColors,
-                        borderWidth: 0,
-                        hoverOffset: 10
-                    }]
-                },
+                data: chartData,
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'right', labels: { color: document.documentElement.classList.contains('dark') ? '#94a3b8' : '#475569' } }
-                    }
+                        legend: { position: 'right', labels: { color: isDark ? '#94a3b8' : '#475569' } }
+                    },
+                    scales: state.chartType === 'line' || state.chartType === 'bar' ? {
+                        y: { ticks: { color: isDark ? '#94a3b8' : '#475569' }, grid: { color: isDark ? '#334155' : '#e2e8f0' } },
+                        x: { ticks: { color: isDark ? '#94a3b8' : '#475569' }, grid: { display: false } }
+                    } : {}
+                }
+            });
+
+            // Update toggle buttons
+            document.querySelectorAll('.chart-toggle').forEach(btn => {
+                if(btn.dataset.type === state.chartType) {
+                    btn.className = "chart-toggle px-3 py-1 rounded-md transition-all bg-brand-600 text-white shadow-md";
+                } else {
+                    btn.className = "chart-toggle px-3 py-1 rounded-md transition-all text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white";
                 }
             });
         };
 
-        // --- RENDER TABLE & MISC ---
+        // --- UI & TABLE ---
         const updateUI = () => {
-            // Render Table
             elements.table.innerHTML = '';
             const filter = el('search-input').value.toLowerCase();
-            const filtered = state.logs.filter(l => l.subject.toLowerCase().includes(filter) || (l.comments||'').toLowerCase().includes(filter));
+            const filtered = state.logs.filter(l => l.subject.toLowerCase().includes(filter) || (l.comments||'').toLowerCase().includes(filter) || (l.type||'').toLowerCase().includes(filter));
             
             if (filtered.length === 0) el('empty-state').classList.remove('hidden');
             else el('empty-state').classList.add('hidden');
@@ -649,7 +708,7 @@
                             <div class="w-2 h-8 rounded-full" style="background:${state.colors[log.subject] || '#ccc'}"></div>
                             <div>
                                 <div class="font-medium dark:text-gray-200">${log.subject}</div>
-                                <div class="text-xs text-gray-500">${log.type || 'Geral'} • ${log.comments ? log.comments.substring(0,20)+'...' : ''}</div>
+                                <div class="text-xs text-gray-500">${log.type || 'Geral'} • <span class="math-tex">${log.comments ? log.comments.substring(0,40) : ''}</span></div>
                             </div>
                         </div>
                     </td>
@@ -659,21 +718,26 @@
                     <td class="px-4 py-3 font-mono text-xs dark:text-gray-300">
                         ${log.duration}
                     </td>
-                    <td class="px-4 py-3 text-right">
-                        <button onclick="deleteLog(${log.id})" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 p-1.5 rounded-md transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    <td class="px-4 py-3 text-right flex justify-end gap-2">
+                         <button onclick="editLog(${log.id})" class="text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 p-1.5 rounded-md transition-colors" title="Editar"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                        <button onclick="deleteLog(${log.id})" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 p-1.5 rounded-md transition-colors" title="Excluir"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                     </td>
                 `;
                 elements.table.appendChild(row);
             });
             lucide.createIcons();
             
-            // Datalist update
+            // Trigger MathJax re-render
+            if (window.MathJax) {
+                MathJax.typesetPromise && MathJax.typesetPromise();
+            }
+
             const subjects = [...new Set(state.logs.map(l => l.subject))];
             elements.subjectList.innerHTML = subjects.map(s => `<option value="${s}">`).join('');
 
-            calculateKPIs();
-            renderHeatmap();
-            renderChart();
+            calculateKPIs(filtered);
+            renderHeatmap(filtered);
+            renderChart(filtered);
             checkReminders();
         };
 
@@ -681,6 +745,7 @@
         window.deleteLog = (id) => {
             if(confirm('Apagar registro?')) {
                 state.logs = state.logs.filter(l => l.id !== id);
+                if(state.editingId === id) endEditMode();
                 saveData();
                 showToast("Registro apagado", "error");
             }
@@ -691,25 +756,20 @@
         document.querySelectorAll('.chart-toggle').forEach(btn => {
             btn.onclick = (e) => {
                 state.chartType = e.target.dataset.type;
-                renderChart();
-                // Toggle active styles logic here simplified
+                updateUI();
             }
         });
 
-        // Dark Mode Toggle Logic (Fix)
         el('dark-mode-toggle').onclick = () => {
             document.documentElement.classList.toggle('dark');
             const isDark = document.documentElement.classList.contains('dark');
             localStorage.setItem('studyLogDarkMode', isDark);
-            
-            // We need to re-render chart to update the legend text colors
-            renderChart();
+            updateUI();
         };
 
-        // Reminders Check
         const checkReminders = () => {
             el('reminders-section').innerHTML = '';
-            const today = getLocalDateStr(new Date()); // Use local date for check
+            const today = getLocalDateStr(new Date());
             const due = state.logs.filter(l => l.reminder && l.reminder <= today);
             
             if(due.length) {
@@ -729,10 +789,8 @@
             }
         };
 
-        // Shortcuts
         document.querySelectorAll('.reminder-shortcut').forEach(btn => {
             btn.onclick = (e) => {
-                // Parse date input safely manually to avoid UTC conversion
                 const currentVal = el('date').value;
                 let d;
                 if(currentVal) {
@@ -741,18 +799,15 @@
                 } else {
                     d = new Date();
                 }
-                
                 d.setDate(d.getDate() + parseInt(e.target.dataset.days));
                 el('reminder-date').value = getLocalDateStr(d);
             };
         });
 
-        // Color sync
         el('subject').addEventListener('input', (e) => {
             if(state.colors[e.target.value]) el('subject-color').value = state.colors[e.target.value];
         });
 
-        // Toast
         const showToast = (msg, type) => {
             const t = document.createElement('div');
             t.className = `px-4 py-2 rounded shadow-lg text-white text-sm font-medium animate-bounce ${type === 'error' ? 'bg-red-500' : 'bg-green-600'}`;
@@ -761,13 +816,35 @@
             setTimeout(() => t.remove(), 3000);
         };
 
-        // Export/Import JSON
         el('export-json-btn').onclick = () => {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ logs: state.logs, colors: state.colors }));
             const link = document.createElement('a');
             link.setAttribute("href", dataStr);
             link.setAttribute("download", "study_backup_" + getLocalDateStr(new Date()) + ".json");
             link.click();
+        };
+        
+        el('export-csv-btn').onclick = () => {
+            if (state.logs.length === 0) {
+                showToast("Sem dados para exportar", "error");
+                return;
+            }
+            const headers = ["ID", "Assunto", "Tipo", "Data", "Duração", "Comentários"];
+            const rows = state.logs.map(log => [
+                log.id,
+                `"${(log.subject || '').replace(/"/g, '""')}"`,
+                log.type || '',
+                log.date,
+                log.duration,
+                `"${(log.comments || '').replace(/"/g, '""')}"`
+            ]);
+            const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `study_export_${getLocalDateStr(new Date())}.csv`;
+            link.click();
+            showToast("CSV exportado com sucesso!", "success");
         };
 
         el('import-json').onchange = (e) => {
@@ -790,7 +867,6 @@
             reader.readAsText(file);
         };
 
-        // Initialize
         el('date').value = getLocalDateStr(new Date());
         updateUI();
 
