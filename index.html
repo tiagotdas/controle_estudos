@@ -67,7 +67,7 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center gap-3">
                     <i data-lucide="sigma" class="text-brand-600 dark:text-brand-500 w-8 h-8"></i>
-                    <span class="font-bold text-xl tracking-tight">StudyTracker <span class="text-brand-600 dark:text-brand-400">v3.1</span></span>
+                    <span class="font-bold text-xl tracking-tight">StudyTracker <span class="text-brand-600 dark:text-brand-400">v3.2</span></span>
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="hidden md:flex gap-2 mr-4 border-r pr-4 dark:border-gray-700">
@@ -439,8 +439,12 @@
         };
 
         const calcDurationStr = (start, end) => {
+            if (!start || !end) return "0h 00m";
             const d1 = new Date(`1970-01-01T${start}`);
             const d2 = new Date(`1970-01-01T${end}`);
+            
+            if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return "0h 00m";
+
             let diff = (d2 - d1) / 60000; 
             if (diff < 0) diff += 24 * 60;
             const h = Math.floor(diff / 60);
@@ -449,6 +453,7 @@
         };
 
         const calcMinutes = (durationStr) => {
+            if(!durationStr) return 0;
             const match = durationStr.match(/(\d+)h (\d+)m/);
             return match ? parseInt(match[1])*60 + parseInt(match[2]) : 0;
         };
@@ -866,6 +871,14 @@
             };
             reader.readAsText(file);
         };
+
+        // Initialize and Fix Data
+        state.logs.forEach(log => {
+            if (log.duration && (log.duration.includes('NaN') || log.duration === '0h 00m')) {
+                log.duration = calcDurationStr(log.startTime, log.endTime);
+            }
+        });
+        saveData();
 
         el('date').value = getLocalDateStr(new Date());
         updateUI();
